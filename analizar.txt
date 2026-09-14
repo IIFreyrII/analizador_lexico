@@ -1,0 +1,5 @@
+Lista por comprar:
+GPUs
+CPUs
+RAM
+SSD
