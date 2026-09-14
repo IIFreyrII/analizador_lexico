@@ -2,7 +2,7 @@ import re
 
 codigo = """x1das = 5 + 3 / a1fk
 X = 2"""
-
+#hacer cambios
 # Diccionario de tokens con regex
 especificacion_tokens = {
     'ESPACIO':      '[ \t]+',               #Así se especifican espaciones según la documentación de Python, el + es para que acepte 1 o más veces
