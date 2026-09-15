@@ -47,10 +47,10 @@ def analizar(codigo):
                 else:
                     # Si no es espacio ni salto ni comentario, SÍ es un token válido
                     tokens.append({
-                        'Type': tipo,
-                        'Value': valor,
-                        'Line': linea,
-                        'Col': columna
+                        "Type": tipo,
+                        "Value": valor,
+                        "Line": linea,
+                        "Col": columna,
                     })
                     columna += len(valor)
 
@@ -62,22 +62,24 @@ def analizar(codigo):
             )
 
     # El fin de archivo tambien es un token EOF
-    tokens.append({'Type': 'EOF', 'Value': None, 'Line': linea, 'Col': columna})
+    tokens.append({"Type": "EOF", "Value": None, "Line": linea, "Col": columna})
     return tokens
 
+leer_archivo = "analizar.txt"
+escribir_archivo = "resultado.json"
+
 # def read_file():
-#     with open("analizar.txt", "r", encoding="utf-8") as archivo:
-#         for numero_linea, linea in enumerate (archivo, start=1):
+#     with open(leer_archivo, "r") as archivo_txt:
+#         for numero_linea, linea in enumerate (archivo_txt, start=1):
 #             print(f"Análisis de linea {numero_linea}:")
 #             resultado = analizar(codigo)
 #             for token in resultado:
 #                 print(token)
 
 def write_file():
-    with open("resultado.json", "w", encoding="utf-8") as archivo:
+    with open(escribir_archivo, "w") as archivo_json:
         for token in resultado:
-            archivo.write(f"{token}\n")
-
+            json.dump(token, archivo_json, indent=2)
 
 if __name__ == '__main__':
     resultado = analizar(codigo)
