@@ -1,89 +1,98 @@
 import re
 import json
 
-codigo = """x1das = 5 + 3 \n/ a1fk
-X1 = 2"""
+# Archivos de entrada y salida
+leer_archivo = "analizar.txt"
+escribir_archivo = "resultado.json"
 
 # Diccionario de tokens con regex
 especificacion_tokens = {
-    'ESPACIO':      '[ \t]+',               #Así se especifican espaciones según la documentación de Python, el + es para que acepte 1 o más veces
-    'SALTO_LINEA':  '[ \n]+',               #Así se especifican saltos de línea según la documentación de Python, el + es para que acepte 1 o más veces
-    'COMENTARIO':    '#.*',                 #El punto es para que acepte cualquier caracter, y el asterisco es para que acepte 0 o más veces después del sharp
-    'ID':         r'[a-zA-Z]1[a-zA-Z0-9]*',
-    'NUM':        r'[\d]+',
-    'OP_EQUAL':   '=',
-    'OP_ADD':     '[+]',
-    'OP_SUB':     '-',
-    'OP_MULT':    '[*]',
-    'OP_DIV':     '/',
-    'OP_POT':     r'\^',
-    'OP_ROOT':    r'\\',                   #El doble backslash es para que Python lo interprete como un solo backslash, ya que el backslash es un caracter de escape, la r es para que Python lo interprete como un raw string, y no como un string normal
-    'PAR_OPEN':   '[(]',
-    'PAR_CLOSE':  '[)]',
+    'ESPACIO':      r'[ \t]+',
+    'SALTO_LINEA':  r'[ \n]+',
+    'COMENTARIO':   r'#.*',
+    'ID':           r'[a-zA-Z]1[\w]*',
+    'NUM':          r'[\d]+',
+    'OP_EQUAL':     r'=',
+    'OP_ADD':       r'[+]',
+    'OP_SUB':       r'-',
+    'OP_MULT':      r'[*]',
+    'OP_DIV':       r'/',
+    'OP_POT':       r'\^',
+    'OP_ROOT':      r'\\',
+    'PAR_OPEN':     r'[(]',
+    'PAR_CLOSE':    r'[)]',
 }
 
 def analizar(codigo):
-    tokens = []
+    tokens_lista = []
     linea = 1
     columna = 1
     pos = 0
 
     while pos < len(codigo):
-
         for tipo, patron in especificacion_tokens.items():
             coincidencia = re.match(patron, codigo[pos:])
             if coincidencia:
                 valor = coincidencia.group()
 
                 if tipo in ('ESPACIO', 'COMENTARIO', 'SALTO_LINEA'):
-                    # Si capturamos un salto de línea, actualizamos el contador de líneas
                     if '\n' in valor:
                         linea += valor.count('\n')
-                        # Reiniciamos la columna
                         columna = len(valor) - valor.rfind('\n')
                     else:
                         columna += len(valor)
-
                 else:
-                    # Si no es espacio ni salto ni comentario, SÍ es un token válido
-                    tokens.append({
-                        "Type": tipo,
-                        "Value": valor,
-                        "Line": linea,
-                        "Col": columna,
+                    # Guardamos el token usando claves en minúscula como pediste
+                    tokens_lista.append({
+                        "type": tipo,
+                        "value": valor,
+                        "linea": linea,
+                        "columna": columna
                     })
                     columna += len(valor)
 
                 pos += len(valor)
                 break
         else:
+            # ESTO DETIENE EL ANALIZADOR SI HAY UN CARÁCTER INVÁLIDO
             raise SyntaxError(
                 f"Carácter no reconocido {codigo[pos]!r} en línea {linea}, columna {columna}"
             )
 
-    # El fin de archivo tambien es un token EOF
-    tokens.append({"Type": "EOF", "Value": None, "Line": linea, "Col": columna})
-    return tokens
+    # Añadimos el End Of File
+    tokens_lista.append({"type": "EOF", "value": None, "linea": linea, "columna": columna})
 
-leer_archivo = "analizar.txt"
-escribir_archivo = "resultado.json"
+    # CONVERSIÓN AL FORMATO JSON DESEADO ("token1": {...}, "token2": {...})
+    diccionario_salida = {}
+    for indice, token in enumerate(tokens_lista, start=1):
+        nombre_token = f"token{indice}"
+        diccionario_salida[nombre_token] = token
 
-# def read_file():
-#     with open(leer_archivo, "r") as archivo_txt:
-#         for numero_linea, linea in enumerate (archivo_txt, start=1):
-#             print(f"Análisis de linea {numero_linea}:")
-#             resultado = analizar(codigo)
-#             for token in resultado:
-#                 print(token)
+    return diccionario_salida
 
-def write_file():
-    with open(escribir_archivo, "w") as archivo_json:
-        for token in resultado:
-            json.dump(token, archivo_json, indent=2)
+def procesar_archivos():
+    # 1. LEER EL ARCHIVO .TXT
+    try:
+        with open(leer_archivo, "r", encoding="utf-8") as archivo_txt:
+            codigo_fuente = archivo_txt.read()
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo '{leer_archivo}'.")
+        return
+
+    # 2. ANALIZAR EL CÓDIGO
+    try:
+        resultado = analizar(codigo_fuente)
+    except SyntaxError as error:
+        print(f"\nERROR LÉXICO: {error}")
+        print("El análisis se ha detenido. No se generará el archivo JSON.\n")
+        return # Detiene la ejecución para no crear el json si hay error
+
+    # 3. ESCRIBIR EL ARCHIVO .JSON
+    with open(escribir_archivo, "w", encoding="utf-8") as archivo_json:
+        # json.dump escribe todo el diccionario de una vez con el formato correcto
+        json.dump(resultado, archivo_json, indent=2, ensure_ascii=False)
+
+    print(f"\nAnálisis exitoso. Los resultados se guardaron en '{escribir_archivo}'\n")
 
 if __name__ == '__main__':
-    resultado = analizar(codigo)
-    for token in resultado:
-        print(token)
-    # read_file()
-    write_file()
+    procesar_archivos()

@@ -1,0 +1,56 @@
+{
+  "token1": {
+    "type": "ID",
+    "value": "x1dsadnkl",
+    "linea": 1,
+    "columna": 1
+  },
+  "token2": {
+    "type": "OP_EQUAL",
+    "value": "=",
+    "linea": 1,
+    "columna": 11
+  },
+  "token3": {
+    "type": "NUM",
+    "value": "123",
+    "linea": 1,
+    "columna": 14
+  },
+  "token4": {
+    "type": "OP_ADD",
+    "value": "+",
+    "linea": 1,
+    "columna": 18
+  },
+  "token5": {
+    "type": "ID",
+    "value": "s1adsd",
+    "linea": 1,
+    "columna": 20
+  },
+  "token6": {
+    "type": "OP_SUB",
+    "value": "-",
+    "linea": 1,
+    "columna": 27
+  },
+  "token7": {
+    "type": "NUM",
+    "value": "1233",
+    "linea": 1,
+    "columna": 29
+  },
+  "token8": {
+    "type": "NUM",
+    "value": "31232",
+    "linea": 2,
+    "columna": 1
+  },
+  "token9": {
+    "type": "EOF",
+    "value": null,
+    "linea": 2,
+    "columna": 6
+  }
+}
