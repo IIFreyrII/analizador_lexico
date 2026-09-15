@@ -1,14 +1,21 @@
 import re
+import json
 
-codigo = """x1das = 5 + 3 / a1fk
-X = 2"""
-#hacer cambios
+#leer codigo
+archivo = open('entrada.txt', 'r')
+codigo = archivo.read()
+archivo.close()
+
+# codigo = """das = 5 + 3 / fk
+# X = 2"""
+
 # Diccionario de tokens con regex
 especificacion_tokens = {
     'ESPACIO':      '[ \t]+',               #Así se especifican espaciones según la documentación de Python, el + es para que acepte 1 o más veces
     'COMENTARIO':    '#.*',                 #El punto es para que acepte cualquier caracter, y el asterisco es para que acepte 0 o más veces después del sharp
-    'ID':         r'[a-zA-Z]1[a-zA-Z0-9]*',
-    'NUM':        '[0-9]+',
+    'SALTO':      '\n',
+    'ID':         r'[a-zA-Z][a-zA-Z0-9]*',
+    'NUM':        r'[0-9]+(?![a-zA-Z0-9])',
     'OP_EQUAL':   '=',
     'OP_ADD':     '[+]',
     'OP_SUB':     '-',
@@ -37,8 +44,8 @@ def analizar(codigo):
                     # Se ignoran
                     columna += len(valor)
 
-                elif "\n" in codigo:
-                    linea += len(valor)
+                elif tipo in 'SALTO':
+                    linea += 1
                     columna = 1
 
                 else:
@@ -61,7 +68,13 @@ def analizar(codigo):
     tokens.append({'Type': 'EOF', 'Value': None, 'Line': linea, 'Col': columna})
     return tokens
 
-if __name__ == '__main__':
-    resultado = analizar(codigo)
-    for token in resultado:
-        print(token)
+# guardar resultado
+resultado = analizar(codigo)
+with open('resultadocorrec', 'w') as archivo:
+    json.dump(resultado, archivo)
+archivo.close()
+
+# if __name__ == '__main__':
+#    resultado = analizar(codigo)
+#    for token in resultado:
+#        print(token)
